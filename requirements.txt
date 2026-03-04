@@ -3,7 +3,7 @@ aiohappyeyeballs==2.6.1
 aiohttp==3.13.2
 aiosignal==1.4.0
 annotated-types==0.7.0
-anthropic==0.75.0
+anthropic==0.78.0
 anyio==4.11.0
 argon2-cffi==25.1.0
 argon2-cffi-bindings==25.1.0
@@ -43,7 +43,7 @@ curl-cffi==0.13.0
 cycler==0.12.1
 dashscope==1.25.2
 dataclasses-json==0.6.7
-deepagents==0.3.7
+deepagents==0.4.3
 distro==1.9.0
 docstring-parser==0.17.0
 duckdb==1.4.2
@@ -96,12 +96,12 @@ jsonschema-rs==0.29.1
 jsonschema-specifications==2025.9.1
 kiwisolver==1.4.9
 kubernetes==33.1.0
-langchain==1.2.7
-langchain-anthropic==1.3.1
+langchain==1.2.10
+langchain-anthropic==1.3.3
 langchain-chroma==1.0.0
 langchain-classic==1.0.0
 langchain-community==0.4.1
-langchain-core==1.2.7
+langchain-core==1.2.16
 langchain-google-genai==4.2.0
 langchain-huggingface==1.2.0
 langchain-mcp-adapters==0.1.14
@@ -110,7 +110,7 @@ langchain-openai==1.1.0
 langchain-tavily==0.2.13
 langchain-text-splitters==1.0.0
 langfuse==3.10.1
-langgraph==1.0.7
+langgraph==1.0.8
 langgraph-api==0.5.26
 langgraph-checkpoint==3.0.1
 langgraph-cli==0.4.7
@@ -277,4 +277,34 @@ yarl==1.22.0
 yfinance==0.2.66
 zipp==3.23.0
 zstandard==0.25.0
+
+
+# ==============================================================================
+# Embedding 模型修复相关依赖
+# ==============================================================================
+# 以下依赖用于修复本地 embedding 模型加载问题
+# 问题：本地 embedding 模型无法加载，导致向量检索功能不可用
+# 修复时间：2026-03-03
+#
+# 依赖说明：
+# - sentence-transformers: 用于加载和运行 sentence-transformers 模型
+# - langchain-huggingface: LangChain 与 HuggingFace 的集成，提供统一的 embedding 接口
+# - transformers: HuggingFace 的深度学习模型库，提供 BERT 等模型架构
+# - torch: PyTorch 深度学习框架，提供张量运算和神经网络支持
+# - tokenizers: HuggingFace 的分词器库，用于文本预处理
+# - safetensors: 安全的张量格式，用于存储和加载模型权重
+#
+# 模型信息：
+# - 模型名称: shibing624/text2vec-base-chinese
+# - 模型大小: 409 MB
+# - 模型维度: 768
+# - 模型架构: BERT (12层，12个注意力头)
+# - 模型路径: Backend/models/models--shibing624--text2vec-base-chinese/
+#
+# 修复效果：
+# - ✅ 恢复向量检索功能（之前仅使用 BM25）
+# - ✅ 提升查询准确性（支持语义相似度检索）
+# - ✅ 减少对在线 API 的依赖
+# - ✅ 改善推荐问题生成和图表生成功能
+# ==============================================================================
 zstd==1.5.7.3

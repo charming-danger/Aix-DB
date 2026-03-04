@@ -69,3 +69,5 @@ examples/
 !config/**/*.py
 !constants/
 !constants/**/*.py
+/日志信息.txt
+/学习文档.md

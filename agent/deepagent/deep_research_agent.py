@@ -410,6 +410,12 @@ class DeepAgent:
             tools=sql_tools,
             backend=FilesystemBackend(root_dir=current_dir),
         )
+        
+        # 📝 记录 Skill 加载情况
+        logger.info(f"✅ Deep Agent 创建成功 - 数据源: {datasource_id}")
+        logger.info(f"📚 Skill 目录: {os.path.join(current_dir, 'skills/')}")
+        logger.info(f"🔧 可用工具: {[tool.name for tool in sql_tools]}")
+        
         return agent
 
     # ==================== 核心执行 ====================
@@ -657,6 +663,14 @@ class DeepAgent:
                     if not token_text:
                         continue
 
+                    # 🔍 追踪 AI 输出内容（用于验证 Skill 使用）
+                    if token_count == 0:
+                        logger.info(f"📝 AI 开始输出 - 节点: {node_name}, 首次内容: {token_text[:100]}")
+                    if "需求理解" in token_text or "执行计划" in token_text:
+                        logger.info(f"✅ Skill 已生效 - AI 输出了'思考与规划'格式")
+                    if "sql_db_" in token_text or "工具调用" in token_text:
+                        logger.info(f"✅ AI 正在调用工具 - 内容: {token_text[:100]}")
+
                     # 阶段检测
                     new_phase = self._detect_phase(node_name, token_text, tracker)
                     tracker.current_node = node_name
@@ -833,9 +847,11 @@ class DeepAgent:
         try:
             if isinstance(msg, AIMessage):
                 if hasattr(msg, "tool_calls") and msg.tool_calls:
+                    logger.info(f"🔧 AI 调用工具 - 工具数量: {len(msg.tool_calls)}")
                     for tc in msg.tool_calls:
                         name = tc.get("name", "unknown")
                         args = tc.get("args", {})
+                        logger.info(f"🔧 工具调用 - 名称: {name}, 参数: {args}")
                         tool_msg = self._format_tool_call(name, args)
                         if tool_msg:
                             if not await self._safe_write(response, "\n\n"):
@@ -847,6 +863,7 @@ class DeepAgent:
             elif isinstance(msg, ToolMessage):
                 name = getattr(msg, "name", "")
                 content_str = str(msg.content) if msg.content else ""
+                logger.info(f"🔧 工具返回 - 名称: {name}, 内容长度: {len(content_str)}")
                 tool_result_msg = self._format_tool_result(name, content_str)
                 if tool_result_msg:
                     msg_type = "error" if "error" in content_str.lower() else "info"
